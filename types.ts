@@ -1,4 +1,3 @@
-
 export interface TarotCard {
   name: string;
   key: string;
@@ -17,6 +16,7 @@ export interface DrawnCard {
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
+  cards?: DrawnCard[];
 }
 
 export type AppView = 'tarot' | 'chat';
