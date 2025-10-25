@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { DrawnCard } from "../types";
+import { DrawnCard, Spread } from "../types";
 
 async function generateGeminiResponse(prompt: string): Promise<string> {
     try {
@@ -18,20 +18,25 @@ async function generateGeminiResponse(prompt: string): Promise<string> {
     }
 }
 
-export async function getTarotInterpretation(question: string, cards: DrawnCard[]): Promise<string> {
-  const cardDetails = cards.map(c => `- ${c.position}: ${c.card.name} (${c.orientation})`).join('\n');
+export async function getTarotInterpretation(question: string, cards: DrawnCard[], spread: Spread): Promise<string> {
+  const cardDetails = cards
+    .map(c => `- Carte ${c.positionNumber} (${c.position}): ${c.card.name} (${c.orientation === 'upright' ? 'droite' : 'renversée'})`)
+    .join('\n');
 
-  const prompt = `Agis comme un tarologue bienveillant, clair et visuel, spécialisé dans le Tarot de Marseille.
+  const prompt = `Agis comme un tarologue expert, bienveillant, et profondément psychologique, spécialisé dans le Tarot de Marseille.
 L'utilisateur a posé la question suivante : "${question}"
 
-Voici son tirage à 3 cartes :
+Il a choisi d'utiliser le tirage nommé "${spread.title}", dont le but est de : "${spread.purpose}".
+
+Voici son tirage et la signification de chaque position :
 ${cardDetails}
 
-Fournis une interprétation détaillée et introspective en suivant cette structure :
-1.  **Interprétation de chaque carte** : Pour chaque carte, rappelle sa position (Passé, Présent, Futur), son nom, et donne son interprétation dans le contexte de la question. Base-toi sur le symbolisme visuel, la numérologie et les couleurs du TDM.
-2.  **Synthèse et Message Clé** : Relie les trois interprétations pour offrir une vue d'ensemble et un conseil final répondant à la question initiale.
+Fournis une interprétation riche, introspective et structurée en suivant ces étapes :
+1.  **Analyse Individuelle des Cartes**: Pour chaque carte, dans l'ordre du tirage (de 1 à ${cards.length}), donne une interprétation détaillée. Rappelle son numéro de position, la signification de cette position, le nom de la carte, et explique sa signification symbolique et psychologique en lien direct avec la question de l'utilisateur ET la signification de son emplacement dans ce tirage spécifique.
+2.  **Dynamique du Tirage (Synthèse)**: Crée des liens entre les cartes. Comment interagissent-elles ? Y a-t-il une progression, un conflit, une résonance entre elles ? Révèle l'histoire que les cartes racontent ensemble pour répondre à la question initiale.
+3.  **Conseil et Action**: Conclus avec un message clé clair et un conseil pratique. Que doit comprendre l'utilisateur ? Quelle action ou quel changement de perspective est suggéré pour avancer ?
 
-Ton ton doit être bienveillant, clair et centré sur l'introspection de l'utilisateur.`;
+Ton ton doit être inspirant, non-fataliste, et centré sur le pouvoir personnel et le développement de l'utilisateur. Utilise un langage visuel et poétique pour évoquer les arcanes, mais reste toujours clair et compréhensible. Formate ta réponse en Markdown pour une meilleure lisibilité (titres, listes, gras).`;
 
   return generateGeminiResponse(prompt);
 }
